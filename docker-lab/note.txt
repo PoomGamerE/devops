@@ -4,7 +4,7 @@ docker rmi -f $(docker images -q)
 docker network rm $(docker network ls -q)
 
 cd ~
-git clone https://github.com/PoomGamerE/users_backend.git lab12
+git clone https://github.com/PoomGamerE/devops.git lab12
 docker network create my_network
 
 cd ~/lab12/docker-lab/mysql
@@ -13,10 +13,10 @@ docker run -d --name db-container --network my_network -p 3306:3306 mysql-db
 
 cd ~/lab12/docker-lab/backend
 docker build -t backend12 .
-sleep 20
+sleep 40
 docker run -d --name backend-container --network my_network -p 5000:5000 backend12
 
 cd ~/lab12/docker-lab/web
 docker build -t frontend12 .
-sleep 20
+sleep 30
 docker run -d --name web-container -p 80:80 --network my_network frontend12
