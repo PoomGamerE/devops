@@ -1,0 +1,32 @@
+# ===== STAGE 1: Build Application =====
+FROM openjdk:17 AS builder
+
+# ตั้งค่า Working Directory
+WORKDIR /app
+
+# คัดลอกไฟล์ทั้งหมดเข้าไปใน Container
+COPY . .
+
+# ให้สิทธิ์ execute กับ mvnw
+RUN chmod +x mvnw
+
+# ติดตั้ง dependencies ล่วงหน้า (ใช้ Cache Optimization)
+RUN ./mvnw dependency:go-offline
+
+# คอมไพล์โค้ดและสร้าง JAR
+RUN ./mvnw clean package -DskipTests
+
+# ===== STAGE 2: Run Application =====
+FROM openjdk:17-jdk-slim
+
+# ตั้งค่า Working Directory
+WORKDIR /app
+
+# คัดลอก JAR ไฟล์จาก Stage 1
+COPY --from=builder /app/target/*.jar app.jar
+
+# Expose Port
+EXPOSE 5000
+
+# รัน Spring Boot App
+CMD ["java", "-jar", "app.jar"]
